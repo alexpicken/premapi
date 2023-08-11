@@ -1,13 +1,10 @@
 from flask import Flask, jsonify
 import requests
 from bs4 import BeautifulSoup
-from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-CORS(app, support_credentials=True)
 
 @app.route('/', methods=["GET"])
-@cross_origin(origin='*',supports_credentials=True)
 def table():
     list = []
     link = f"https://www.eurosport.com/football/premier-league/standings.shtml"
