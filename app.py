@@ -1,20 +1,24 @@
 from flask import Flask, jsonify
 import requests
-from bs4 import BeautifulSoup
+import os
 
 app = Flask(__name__)
 
 @app.route('/', methods=["GET"])
 def table():
-    list = []
-    link = f"https://www.eurosport.com/football/premier-league/standings.shtml"
-    r = requests.get(link)
-    data = r.text
-    soup = BeautifulSoup(data,"lxml")
-    tab = soup.find_all("a", class_="absolute right-1 max-w-full truncate left-8 lg:caps-s5-fx hidden md:block")
-    for row in tab:
-        list.append(row.string)
-    response = jsonify(list)
+    headers = {
+        "X-Auth-Token": os.environ.get("FOOTBALL_API_KEY")
+    }
+
+    url = "https://api.football-data.org/v4/competitions/PL/standings"
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    teams = []
+    for entry in data["standings"][0]["table"]:
+        teams.append(entry["team"]["name"])
+    
+    response = jsonify(teams)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
